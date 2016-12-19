@@ -1,43 +1,29 @@
 package ms.demo.back;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static spark.Spark.get;
+import static spark.Spark.port;
 
-
-@RestController
-@RequestMapping(value = "/backend", produces = {APPLICATION_JSON_VALUE})
 public class BackendController {
-
-    @RequestMapping(method = RequestMethod.GET)
-    public String defaultPage() {
-        try {
-            return "This is backend worker:" + workerIP();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error happen:" + e.getMessage();
-        }
-
+    public static void main(String[] args) {
+        port(8071);
+        get("/", (req, res) -> "This is backend worker:" + InetAddress.getLocalHost().getHostAddress().toString());
+        get("/backend/hex", (req, res) -> {
+            String str = req.queryParams("str");
+            try {
+                return "Hex code:" + bytesToHex(str.getBytes(Charset.forName("UTF-8"))) + "\n\nWorker--" + workerIP();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "Error when calculating:" + e.getMessage();
+            }
+        });
     }
 
-    @RequestMapping(value = "/hex", method = RequestMethod.GET)
-    public String convert(@RequestParam(name = "str", required = true) String str) {
-        try {
-            return "Hex code:" + bytesToHex(str.getBytes(Charset.forName("UTF-8"))) + "\n\nWorker--" + workerIP();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error when calculating:" + e.getMessage();
-        }
-    }
-
-    private String workerIP()throws UnknownHostException{
+    private static String workerIP()throws UnknownHostException{
         return InetAddress.getLocalHost().getHostAddress().toString();
     }
 
