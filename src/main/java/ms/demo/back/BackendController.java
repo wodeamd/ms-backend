@@ -10,7 +10,7 @@ import static spark.Spark.port;
 
 public class BackendController {
     public static void main(String[] args) {
-        port(8071);
+        port(8070);
         get("/", (req, res) -> "This is backend worker:" + InetAddress.getLocalHost().getHostAddress().toString());
         get("/backend/hex", (req, res) -> {
             String str = req.queryParams("str");
